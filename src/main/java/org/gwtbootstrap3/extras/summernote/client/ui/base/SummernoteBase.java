@@ -26,6 +26,9 @@ import org.gwtbootstrap3.extras.summernote.client.event.SummernoteBlurEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteBlurHandler;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteChangeEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteChangeHandler;
+import org.gwtbootstrap3.extras.summernote.client.event.SummernoteClickEvent;
+import org.gwtbootstrap3.extras.summernote.client.event.SummernoteClickHandler;
+import org.gwtbootstrap3.extras.summernote.client.event.SummernotClickHandler;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteEnterEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteEnterHandler;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteFocusEvent;
@@ -84,6 +87,7 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
     private boolean hasPasteHandler = false;
     private boolean hasUploadImageHandler = false;
     private boolean hasChangeHandler = false;
+    private boolean hasClickHandler = false;
 
     /**
      *
@@ -110,7 +114,8 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
     public void setMaxHeight(final int maxHeight) {
         options.setMaxHeight(maxHeight);
     }
-
+    
+    
     /**
      * Sets the minimum height of the editor (in pixel).
      *
@@ -338,6 +343,13 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
         hasChangeHandler = true;
         return addHandler(handler, SummernoteChangeEvent.getType());
     }
+    
+    @Override
+    public HandlerRegistration addSummernoteClickHandler(final SummernoteClickHandler handler) {
+    	hasClickHandler = true;
+		return addHandler(handler, SummernoteClickEvent.getType());
+       
+    }
 
     /**
      * Gets the HTML code generated from the editor
@@ -472,6 +484,7 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
         if (this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::hasInitHandler) {
             options.callbacks.onInit = function() {
                 @org.gwtbootstrap3.extras.summernote.client.event.SummernoteInitEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteInitHandlers;)(target);
+               	$(".note-editable").on('click',@org.gwtbootstrap3.extras.summernote.client.event.SummernoteClickEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteClickHandlers;)(target););
             };
         }
         if (this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::hasEnterHandler) {
@@ -512,6 +525,12 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
         if (this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::hasChangeHandler) {
             options.callbacks.onChange = function() {
                 @org.gwtbootstrap3.extras.summernote.client.event.SummernoteChangeEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteChangeHandlers;)(target);
+            };
+        }
+         if (this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::hasClickHandler) {
+            options.callbacks.onInit = function() {
+/
+                
             };
         }
         $wnd.jQuery(e).summernote(options);

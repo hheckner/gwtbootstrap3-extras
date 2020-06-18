@@ -28,7 +28,7 @@ package org.gwtbootstrap3.extras.summernote.client.event;
 public interface HasAllSummernoteHandlers extends HasSummernoteInitHandlers,
         HasSummernoteEnterHandlers, HasSummernoteFocusHandlers, HasSummernoteBlurHandlers,
         HasSummernoteKeyUpHandlers, HasSummernoteKeyDownHandlers, HasSummernotePasteHandlers,
-        HasSummernoteImageUploadHandlers, HasSummernoteChangeHandlers {
+        HasSummernoteImageUploadHandlers, HasSummernoteChangeHandlers, HasSummernoteClickHandlers {
 
     static final String SUMMERNOTE_PREFIX = "summernote.";
 
