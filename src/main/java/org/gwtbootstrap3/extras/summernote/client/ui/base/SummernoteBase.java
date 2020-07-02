@@ -21,6 +21,7 @@ package org.gwtbootstrap3.extras.summernote.client.ui.base;
  */
 
 import org.gwtbootstrap3.client.ui.html.Div;
+import com.google.gwt.user.client.ui.FocusPanel;
 import org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteBlurEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteBlurHandler;
@@ -28,7 +29,6 @@ import org.gwtbootstrap3.extras.summernote.client.event.SummernoteChangeEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteChangeHandler;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteClickEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteClickHandler;
-import org.gwtbootstrap3.extras.summernote.client.event.SummernotClickHandler;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteEnterEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteEnterHandler;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteFocusEvent;
@@ -88,7 +88,7 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
     private boolean hasUploadImageHandler = false;
     private boolean hasChangeHandler = false;
     private boolean hasClickHandler = false;
-
+    
     /**
      *
      */
@@ -153,13 +153,31 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
     }
 
     /**
+     * Customizes the popover toolbar.<br>
+     * <br>
+     * Example:
+     * <pre>
+     * summernote.setPopover(new Toolbar()
+     *     .addGroup(ToolbarButton.OL, ToolbarButton.BOLD)
+     *     .addGroup(ToolbarButton.HELP));
+     * </pre>
+     *
+     * @param toolbar
+     */
+    public void setPopover(final Toolbar toolbar) {
+        options.setPopover(toolbar);
+    }
+
+    /**
      * Set the focus of the editor.
      *
      * @param focus if <code>true</code>, focus on the editor
      */
-    public void setHasFocus(final boolean focus) {
-        options.setFocus(focus);
-    }
+    public void setHasFocus(final boolean focus) {        
+        setFocus(getElement(),focus);
+        SummernoteFocusEvent.fire(this);
+    }      
+
 
     /**
      * Set placeholder of the editor.
@@ -346,9 +364,8 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
     
     @Override
     public HandlerRegistration addSummernoteClickHandler(final SummernoteClickHandler handler) {
-    	hasClickHandler = true;
-		return addHandler(handler, SummernoteClickEvent.getType());
-       
+        hasClickHandler = true;
+        return addHandler(handler, SummernoteClickEvent.getType());
     }
 
     /**
@@ -429,7 +446,14 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
             clear();
         }
     }
-
+    
+    /**
+     * reset range
+     */
+    public void restoreRange() {
+        command(getElement(), "restoreRange");
+    }
+    
     /**
      * Call this when updating options to ensure everything is up to date
      */
@@ -484,7 +508,6 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
         if (this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::hasInitHandler) {
             options.callbacks.onInit = function() {
                 @org.gwtbootstrap3.extras.summernote.client.event.SummernoteInitEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteInitHandlers;)(target);
-               	$(".note-editable").on('click',@org.gwtbootstrap3.extras.summernote.client.event.SummernoteClickEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteClickHandlers;)(target););
             };
         }
         if (this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::hasEnterHandler) {
@@ -527,15 +550,11 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
                 @org.gwtbootstrap3.extras.summernote.client.event.SummernoteChangeEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteChangeHandlers;)(target);
             };
         }
-         if (this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::hasClickHandler) {
-            options.callbacks.onInit = function() {
-/
-                
-            };
-        }
+        
         $wnd.jQuery(e).summernote(options);
-    }-*/;
+}-*/;
 
+    // TODO Remove Clickhandler
     private native void destroy(Element e) /*-{
         $wnd.jQuery(e).summernote('destroy');
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_INIT_EVENT);
@@ -547,6 +566,12 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_PASTE_EVENT);
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_IMAGE_UPLOAD_EVENT);
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_CHANGE_EVENT);
+    }-*/;
+
+    private native void setFocus(Element e, boolean focus) /*-{
+       // $('.note-editable').trigger('focus');       
+       $wnd.jQuery(e).summernote('focus', focus);
+       //  this.focus = focus;
     }-*/;
 
     private native void setCode(Element e, String code) /*-{
@@ -568,4 +593,6 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
     private native void insertImages(Element e, JsArray<ImageFile> images) /*-{
         $wnd.jQuery(e).summernote('insertImages', images);
     }-*/;
+    
+    
 }

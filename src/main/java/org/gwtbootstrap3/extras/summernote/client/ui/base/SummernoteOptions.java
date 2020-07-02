@@ -135,9 +135,9 @@ class SummernoteOptions extends JavaScriptObject {
         for (var i = 0; i < toolbarGroups.length; i++) {
             arr.push(toolbarGroups[i]);
         }
-        return arr;
+        return arr; 
     }-*/;
-
+    
     /**
      * @see {@link SummernoteBase#setToolbar(Toolbar)}
      */
@@ -145,6 +145,19 @@ class SummernoteOptions extends JavaScriptObject {
         this.toolbar = toolbar.@org.gwtbootstrap3.extras.summernote.client.ui.base.Toolbar::build()();
     }-*/;
 
+
+    /**
+     * @see {@link SummernoteBase#setPopover(Toolbar)}
+     */
+    final native void setPopover(Toolbar toolbar) /*-{
+        var arr = [];
+        arr = toolbar.@org.gwtbootstrap3.extras.summernote.client.ui.base.Toolbar::build()(); 
+        this.popover = {
+            air: arr
+        };   
+    }-*/;
+
+    
     /**
      * @see {@link SummernoteBase#setDefaultHeight(int)}
      */
@@ -170,7 +183,15 @@ class SummernoteOptions extends JavaScriptObject {
      * @see {@link SummernoteBase#setHasFocus(boolean)}
      */
     final native void setFocus(boolean focus) /*-{
+         // $('#summernote').summernote('focus');
         this.focus = focus;
+        
+        // if (focus) {
+        //    $wnd.$('.note-editable').trigger('focus');
+        // }
+        // 
+        // $wnd.jQuery().('.note-editable').trigger('focus');
+         
     }-*/;
 
     /**
@@ -209,5 +230,4 @@ class SummernoteOptions extends JavaScriptObject {
             }
         };
     }-*/;
-
 }
