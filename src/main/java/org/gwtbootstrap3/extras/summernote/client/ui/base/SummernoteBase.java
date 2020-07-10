@@ -177,6 +177,12 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
         setFocus(getElement(),focus);
         SummernoteFocusEvent.fire(this);
     }      
+    
+    public void setCursor() {
+        if (isAttached()) {
+            setCursor(getElement());
+        }
+    }
 
 
     /**
@@ -571,8 +577,14 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
     private native void setFocus(Element e, boolean focus) /*-{
        // $('.note-editable').trigger('focus');       
        $wnd.jQuery(e).summernote('focus', focus);
-       //  this.focus = focus;
+       this.focus = focus;
     }-*/;
+
+    private native void setCursor(Element e) /*-{
+         // Places the cursor at the end of a contenteditable container (should also work for textarea / input)
+        this.setLastRange();        
+                
+     }-*/;
 
     private native void setCode(Element e, String code) /*-{
         $wnd.jQuery(e).summernote('code', code);
