@@ -24,14 +24,14 @@ import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.event.shared.GwtEvent;
 
 /**
- * The {@link SummernoteKeyDownEvent} is fired when a key is pressed within
+ * The {@link SummernoteKeyPressEvent} is fired when a key is pressed within
  * the summernote editor.
  *
  * @author Xiaodong Sun
  */
-public class SummernoteKeyDownEvent extends GwtEvent<SummernoteKeyDownHandler> {
+public class SummernoteKeyPressEvent extends GwtEvent<SummernoteKeyPressHandler> {
 
-    private static Type<SummernoteKeyDownHandler> TYPE;
+    private static Type<SummernoteKeyPressHandler> TYPE;
 
     private final NativeEvent nativeEvent;
 
@@ -42,9 +42,9 @@ public class SummernoteKeyDownEvent extends GwtEvent<SummernoteKeyDownHandler> {
      * @param source the source of the handlers
      * @param nativeEvent native key down event
      */
-    public static void fire(final HasSummernoteKeyDownHandlers source, NativeEvent nativeEvent) {
+    public static void fire(final HasSummernoteKeyPressHandlers source, NativeEvent nativeEvent) {
         if (TYPE != null) {
-            SummernoteKeyDownEvent event = new SummernoteKeyDownEvent(nativeEvent);
+            SummernoteKeyPressEvent event = new SummernoteKeyPressEvent(nativeEvent);
             source.fireEvent(event);
         }
     }
@@ -54,21 +54,21 @@ public class SummernoteKeyDownEvent extends GwtEvent<SummernoteKeyDownHandler> {
      *
      * @return returns the handler type
      */
-    public static Type<SummernoteKeyDownHandler> getType() {
+    public static Type<SummernoteKeyPressHandler> getType() {
         if (TYPE == null) {
-            TYPE = new Type<SummernoteKeyDownHandler>();
+            TYPE = new Type<SummernoteKeyPressHandler>();
         }
         return TYPE;
     }
 
     @Override
-    public Type<SummernoteKeyDownHandler> getAssociatedType() {
+    public Type<SummernoteKeyPressHandler> getAssociatedType() {
         return TYPE;
     }
 
     @Override
-    protected void dispatch(final SummernoteKeyDownHandler handler) {
-        handler.onSummnernoteKeyDown(this);
+    protected void dispatch(final SummernoteKeyPressHandler handler) {
+        handler.onSummnernoteKeyPress(this);
     }
 
     @Override
@@ -84,55 +84,23 @@ public class SummernoteKeyDownEvent extends GwtEvent<SummernoteKeyDownHandler> {
     public NativeEvent getNativeEvent() {
         return nativeEvent;
     }
+    
+    /**
+     * Returns the char code
+     * @return 
+     */
+    public int getCharCode() {
+        return getNativeEvent().getCharCode();
+    }
 
     /**
      * Creates a summernote key down event.
      *
      * @param nativeEvent native key down event
      */
-    protected SummernoteKeyDownEvent(NativeEvent nativeEvent) {
+    protected SummernoteKeyPressEvent(NativeEvent nativeEvent) {
         this.nativeEvent = nativeEvent;
     }
-
-    /**
-     * 
-     * @return whether Alt Key is pressed
-     */
-    public boolean isAltKeyDown() {
-        return getNativeEvent().getAltKey();
-    }
-    
-    public boolean isAnyModifierKeyDown() {
-        return isControlKeyDown() || isShiftKeyDown() || isMetaKeyDown()
-            || isAltKeyDown();
-    }
-
-    /**
-     * Is the <code>control</code> key down?
-     * 
-     * @return whether the control key is down
-     */
-    public boolean isControlKeyDown() {
-      return getNativeEvent().getCtrlKey();
-    }
-    
-    /**
-     * Is the <code>meta</code> key down?
-     * 
-     * @return whether the meta key is down
-     */
-    public boolean isMetaKeyDown() {
-      return getNativeEvent().getMetaKey();
-    }
-    
-    /**
-     * Is the <code>shift</code> key down?
-     * 
-     * @return whether the shift key is down
-     */
-    public boolean isShiftKeyDown() {
-      return getNativeEvent().getShiftKey();
-    }   
     
     /**
      * Prevents the browser from taking its default action for the given event.
@@ -148,3 +116,4 @@ public class SummernoteKeyDownEvent extends GwtEvent<SummernoteKeyDownHandler> {
       this.getNativeEvent().stopPropagation();
     }   
 }
+    

@@ -27,7 +27,7 @@ package org.gwtbootstrap3.extras.summernote.client.event;
  */
 public interface HasAllSummernoteHandlers extends HasSummernoteInitHandlers,
         HasSummernoteEnterHandlers, HasSummernoteFocusHandlers, HasSummernoteBlurHandlers,
-        HasSummernoteKeyUpHandlers, HasSummernoteKeyDownHandlers, HasSummernotePasteHandlers,
+        HasSummernoteKeyUpHandlers, HasSummernoteKeyDownHandlers, HasSummernoteKeyPressHandlers, HasSummernotePasteHandlers,
         HasSummernoteImageUploadHandlers, HasSummernoteChangeHandlers, HasSummernoteClickHandlers {
 
     static final String SUMMERNOTE_PREFIX = "summernote.";
@@ -41,6 +41,11 @@ public interface HasAllSummernoteHandlers extends HasSummernoteInitHandlers,
      * The {@link SummernoteEnterEvent} name
      */
     static final String SUMMERNOTE_ENTER_EVENT = SUMMERNOTE_PREFIX + "enter";
+
+    /**
+     * The {@link SummernoteClickEvent} name
+     */
+    static final String SUMMERNOTE_CLICK_EVENT = SUMMERNOTE_PREFIX + "click";
 
     /**
      * The {@link SummernoteFocusEvent} name
@@ -61,6 +66,11 @@ public interface HasAllSummernoteHandlers extends HasSummernoteInitHandlers,
      * The {@link SummernoteKeyDownEvent} name
      */
     static final String SUMMERNOTE_KEYDOWN_EVENT = SUMMERNOTE_PREFIX + "keydown";
+
+    /**
+     * The {@link SummernoteKeyPressEvent} name
+     */
+    static final String SUMMERNOTE_KEYPRESS_EVENT = SUMMERNOTE_PREFIX + "keypress";
 
     /**
      * The {@link SummernotePasteEvent} name

@@ -20,8 +20,6 @@ package org.gwtbootstrap3.extras.summernote.client.ui.base;
  * #L%
  */
 
-import org.gwtbootstrap3.client.ui.html.Div;
-import com.google.gwt.user.client.ui.FocusPanel;
 import org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteBlurEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteBlurHandler;
@@ -40,6 +38,8 @@ import org.gwtbootstrap3.extras.summernote.client.event.SummernoteInitEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteInitHandler;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteKeyDownEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteKeyDownHandler;
+import org.gwtbootstrap3.extras.summernote.client.event.SummernoteKeyPressEvent;
+import org.gwtbootstrap3.extras.summernote.client.event.SummernoteKeyPressHandler;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteKeyUpEvent;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernoteKeyUpHandler;
 import org.gwtbootstrap3.extras.summernote.client.event.SummernotePasteEvent;
@@ -53,15 +53,17 @@ import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.HasEnabled;
 import com.google.gwt.user.client.ui.UIObject;
+import com.google.gwt.user.client.ui.FocusPanel;
 
 /**
  * Wrapper for the Summernote WYSIWYG Editor
+ * Using FocusPanel instead of GWTBootstrap3 Div adds tab index handling to summernote
  * <p/>
  * See: http://summernote.org/
  *
  * @author Xiaodong Sun
  */
-public class SummernoteBase extends Div implements HasAllSummernoteHandlers, HasEnabled {
+public class SummernoteBase extends FocusPanel implements HasAllSummernoteHandlers, HasEnabled {
 
     /**
      * Language; defaults to {@link SummernoteLanguage#EN_US}
@@ -78,21 +80,44 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
      */
     private boolean enabled = true;
 
+    /**
+     * Focused / Blurred state
+     * Used to prevent endless loops when manually setting the focus see also FocusHandler, BlurHandler set in the c'tor
+     */
+    private boolean focused;
+    
     private boolean hasInitHandler = false;
     private boolean hasEnterHandler = false;
     private boolean hasFocusHandler = false;
     private boolean hasBlurHandler = false;
     private boolean hasKeyUpHandler = false;
     private boolean hasKeyDownHandler = false;
+    private boolean hasKeyPressHandler = false;
     private boolean hasPasteHandler = false;
     private boolean hasUploadImageHandler = false;
     private boolean hasChangeHandler = false;
     private boolean hasClickHandler = false;
-    
+
     /**
-     *
+     * We need to attach to the Focus and Blur Event so we can avoid endless loops when setting the focus manually see setHasFocus() below and attribute boolean focues above
      */
-    public SummernoteBase() {}
+    public SummernoteBase() {
+        addSummernoteFocusHandler(new SummernoteFocusHandler() {
+            @Override
+            public void onSummernoteFocus(SummernoteFocusEvent event) {
+                focused = true;                
+            }
+        });
+        
+        addSummernoteBlurHandler(new SummernoteBlurHandler() {
+            @Override
+            public void onSummernoteBlur(SummernoteBlurEvent event) {
+                // TODO Auto-generated method stub
+                focused = false;
+            }            
+        });
+        
+    }
 
     /**
      * Sets the default height of the editor (in pixel).<br>
@@ -114,8 +139,7 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
     public void setMaxHeight(final int maxHeight) {
         options.setMaxHeight(maxHeight);
     }
-    
-    
+
     /**
      * Sets the minimum height of the editor (in pixel).
      *
@@ -173,17 +197,20 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
      *
      * @param focus if <code>true</code>, focus on the editor
      */
-    public void setHasFocus(final boolean focus) {        
-        setFocus(getElement(),focus);
-        SummernoteFocusEvent.fire(this);
+    public void setHasFocus(final boolean focus) {   
+        if (isAttached()) {
+            setFocus(getElement(), focus);
+        }                     
     }      
     
+    /**
+     * set the cursor to the end 
+     */
     public void setCursor() {
-        if (isAttached()) {
+        if (isAttached()) {       
             setCursor(getElement());
-        }
-    }
-
+        }           
+    }    
 
     /**
      * Set placeholder of the editor.
@@ -194,6 +221,15 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
         options.setPlaceholder(placeholder);
     }
 
+    /**
+     * You can disable TAB/Shift+Tab intereaction with the tabDisable option. This will allow tabbing through fields in Forms.
+     *
+     * @param disable true = disable, false = enable
+     */
+    public void disableTab(final boolean disable) {
+        options.disableTab(disable);
+    }
+    
     /**
      * Set customized font names.
      *
@@ -350,6 +386,12 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
         return addHandler(handler, SummernoteKeyDownEvent.getType());
     }
 
+    @Override    
+    public HandlerRegistration addSummernoteKeyPressHandler(SummernoteKeyPressHandler handler) {
+        hasKeyPressHandler = true;
+        return addHandler(handler, SummernoteKeyPressEvent.getType());
+    }
+
     @Override
     public HandlerRegistration addSummernotePasteHandler(final SummernotePasteHandler handler) {
         hasPasteHandler = true;
@@ -396,6 +438,14 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
             setCode(getElement(), code);
         } else {
             getElement().setInnerHTML(code);
+        }
+    }
+    
+    public String getText() {
+        if (isAttached()) {
+            return getText(getElement());
+        } else {
+            return "";
         }
     }
 
@@ -521,6 +571,11 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
                 @org.gwtbootstrap3.extras.summernote.client.event.SummernoteEnterEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteEnterHandlers;)(target);
             };
         }
+        if (this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::hasClickHandler) {
+            options.callbacks.onClick = function () {
+                @org.gwtbootstrap3.extras.summernote.client.event.SummernoteClickEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteClickHandlers;)(target);
+            };
+        }        
         if (this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::hasFocusHandler) {
             options.callbacks.onFocus = function() {
                 @org.gwtbootstrap3.extras.summernote.client.event.SummernoteFocusEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteFocusHandlers;)(target);
@@ -541,6 +596,7 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
                 @org.gwtbootstrap3.extras.summernote.client.event.SummernoteKeyDownEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteKeyDownHandlers;Lcom/google/gwt/dom/client/NativeEvent;)(target, e.originalEvent);
             };
         }
+ 
         if (this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::hasUploadImageHandler) {
             options.callbacks.onImageUpload = function(files) {
                 @org.gwtbootstrap3.extras.summernote.client.event.SummernoteImageUploadEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteImageUploadHandlers;Lcom/google/gwt/core/client/JsArray;)(target, files);
@@ -556,11 +612,10 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
                 @org.gwtbootstrap3.extras.summernote.client.event.SummernoteChangeEvent::fire(Lorg/gwtbootstrap3/extras/summernote/client/event/HasSummernoteChangeHandlers;)(target);
             };
         }
-        
         $wnd.jQuery(e).summernote(options);
-}-*/;
+    }-*/;
 
-    // TODO Remove Clickhandler
+    // TODO Remove KeyPress Handler
     private native void destroy(Element e) /*-{
         $wnd.jQuery(e).summernote('destroy');
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_INIT_EVENT);
@@ -569,25 +624,59 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_BLUR_EVENT);
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_KEYUP_EVENT);
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_KEYDOWN_EVENT);
+        $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_CLICK_EVENT);
+        // $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_KEYPRESS_EVENT);
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_PASTE_EVENT);
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_IMAGE_UPLOAD_EVENT);
         $wnd.jQuery(e).off(@org.gwtbootstrap3.extras.summernote.client.event.HasAllSummernoteHandlers::SUMMERNOTE_CHANGE_EVENT);
     }-*/;
 
-    private native void setFocus(Element e, boolean focus) /*-{
-       // $('.note-editable').trigger('focus');       
-       $wnd.jQuery(e).summernote('focus', focus);
-       this.focus = focus;
+    /**
+     * To prevent endless loops I tried various approaches which all did not work:
+     * 1.)
+     * if .note-editable has the focus, which
+     * var internalElement = $wnd.jQuery(e).next().find('.note-editable');
+     * var currentFocusedElement = $wnd.$(document.activeElement)[0]
+     * reading the console.log currentFocusedElement never seemed to be the .note-editable 
+     *  
+     * @param element
+     * @param focus
+     */
+    private native void setFocus(Element element, boolean focus) /*-{
+        focused = this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::focused;        
+        if (!focused && focus) {
+            $wnd.jQuery(element).next().find('.note-editable').focus();
+            this.@org.gwtbootstrap3.extras.summernote.client.ui.base.SummernoteBase::focused = true;
+        }
     }-*/;
-
-    private native void setCursor(Element e) /*-{
-         // Places the cursor at the end of a contenteditable container (should also work for textarea / input)
-        this.setLastRange();        
+    
+    /**
+     * Places the cursor at the end of a contenteditable container from stackoverflow
+     * @param element
+     */
+    private native void setCursor(Element element) /*-{
+        var note_editable = $wnd.jQuery(element).next().find('.note-editable');        
+        var range = document.createRange();
+        var sel = window.getSelection();
+        var childLength = note_editable.childNodes.length;
+        if (childLength > 0) {
+            var lastNode = note_editable.childNodes[childLength - 1];
+            var lastNodeChildren = lastNode.childNodes.length;
+            range.setStart(lastNode, lastNodeChildren);
+            range.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }            
                 
      }-*/;
 
     private native void setCode(Element e, String code) /*-{
         $wnd.jQuery(e).summernote('code', code);
+    }-*/;
+
+    private native String getText(Element element) /*-{
+        var note_editable = $wnd.jQuery(element).next().find('.note-editable');               
+        return note_editable.text();
     }-*/;
 
     private native String getCode(Element e)/*-{
@@ -605,6 +694,4 @@ public class SummernoteBase extends Div implements HasAllSummernoteHandlers, Has
     private native void insertImages(Element e, JsArray<ImageFile> images) /*-{
         $wnd.jQuery(e).summernote('insertImages', images);
     }-*/;
-    
-    
 }

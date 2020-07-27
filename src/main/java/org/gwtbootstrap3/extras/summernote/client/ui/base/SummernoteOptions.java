@@ -52,7 +52,16 @@ class SummernoteOptions extends JavaScriptObject {
     final native void setPlaceholder(String placeholder) /*-{
         this.placeholder = placeholder;
     }-*/;
+    
+    /**
+     * @see {@link SummernoteBase#disableTab(boolean)}
+     */
+    final native void disableTab(boolean disable) /*-{
+        console.log("disableTab: this is: "+this);
+        this.tabDisable = disable;
+    }-*/;
 
+    
     /**
      * @see {@link SummernoteBase#setFontNames(boolean)}
      */
@@ -135,9 +144,9 @@ class SummernoteOptions extends JavaScriptObject {
         for (var i = 0; i < toolbarGroups.length; i++) {
             arr.push(toolbarGroups[i]);
         }
-        return arr; 
+        return arr;
     }-*/;
-    
+
     /**
      * @see {@link SummernoteBase#setToolbar(Toolbar)}
      */
@@ -145,8 +154,8 @@ class SummernoteOptions extends JavaScriptObject {
         this.toolbar = toolbar.@org.gwtbootstrap3.extras.summernote.client.ui.base.Toolbar::build()();
     }-*/;
 
-
     /**
+     * Air-mode has its own popover, not toolbar. You can customize it with popover.air option.
      * @see {@link SummernoteBase#setPopover(Toolbar)}
      */
     final native void setPopover(Toolbar toolbar) /*-{
@@ -177,21 +186,6 @@ class SummernoteOptions extends JavaScriptObject {
      */
     final native void setMinHeight(int minHeight) /*-{
         this.minHeight = minHeight;
-    }-*/;
-
-    /**
-     * @see {@link SummernoteBase#setHasFocus(boolean)}
-     */
-    final native void setFocus(boolean focus) /*-{
-         // $('#summernote').summernote('focus');
-        this.focus = focus;
-        
-        // if (focus) {
-        //    $wnd.$('.note-editable').trigger('focus');
-        // }
-        // 
-        // $wnd.jQuery().('.note-editable').trigger('focus');
-         
     }-*/;
 
     /**
@@ -230,4 +224,5 @@ class SummernoteOptions extends JavaScriptObject {
             }
         };
     }-*/;
+
 }
