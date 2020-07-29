@@ -655,7 +655,11 @@ public class SummernoteBase extends FocusPanel implements HasAllSummernoteHandle
      * @param element
      */
     private native void setCursor(Element element) /*-{
-        var note_editable = $wnd.jQuery(element).next().find('.note-editable');        
+        var note_editable = $wnd.jQuery(element).next().find('.note-editable')[0];
+        if (note_editable === void(0)) {
+            console.log('note_editable undefined');
+            return;
+        }       
         var range = document.createRange();
         var sel = window.getSelection();
         var childLength = note_editable.childNodes.length;
