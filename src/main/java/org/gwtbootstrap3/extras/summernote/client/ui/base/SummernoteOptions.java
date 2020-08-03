@@ -55,6 +55,9 @@ class SummernoteOptions extends JavaScriptObject {
     
     /**
      * @see {@link SummernoteBase#disableTab(boolean)}
+     * definition after testing it
+     * disable = true means that hitting the tab key in summmernote editor shows a tab in the summernote editor
+     * disable = false means that hitting the tab keyi n summernote editor jumps to the next field 
      */
     final native void disableTab(boolean disable) /*-{
         console.log("disableTab: this is: "+this);
